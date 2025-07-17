@@ -8,7 +8,7 @@ It's neither hogging on client's resources like Anubis nor gathering information
 
 ## Features
 
-- simple radio button form easy for human users to use;
+- simple radio button form easy for human clients to fill;
 - storing only IP;
 - no JS on client-side;
 - fields and values randomized;
