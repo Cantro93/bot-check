@@ -2,7 +2,7 @@
 
 ## About
 
-This module will help verify if the traffic comes from bots or humans.
+This module will help verify if the traffic comes from bots or human client.
 
 It's neither hogging on client's resources like Anubis nor gathering information like reCAPTCHA, and is free software distributed under LGPL 2.1.
 
@@ -66,3 +66,5 @@ const server = http.createServer((req,res) => {
 
 server.listen(1080, 'localhost', () => {console.log("server started")});
 ```
+
+
