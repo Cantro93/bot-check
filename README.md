@@ -20,8 +20,8 @@ It's neither hogging on client's resources like Anubis nor gathering information
 
 ## To do
 
-- make function that will be used as event listener for server `request` event;
-- make npm package.
+- [ ] make function that will be used as event listener for server `request` event;
+- [ ] make npm package.
 
 ## Usage (HTTP sample)
 
