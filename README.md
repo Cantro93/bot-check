@@ -23,6 +23,10 @@ It's neither hogging on client's resources like Anubis nor gathering information
 - [ ] make function that will be used as event listener for server `request` event;
 - [ ] make npm package.
 
+## Installation
+
+Put file botcheck.js into any place in your project, and write down relative path in your `require` clause.
+
 ## Usage (HTTP sample)
 
 ```js
