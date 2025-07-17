@@ -94,6 +94,7 @@ class BotCheck
             <input type="radio" name="${sess.id}" value="${sess.gr}" id="${rand1}"/>
             <input type="submit" value="Submit"/>
           </form>
+          <p><a href="https://github.com/Cantro93/bot-check">Source Code</a></p>
         </body>
         </html>
         `
