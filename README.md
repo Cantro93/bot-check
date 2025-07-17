@@ -26,7 +26,7 @@ It's neither hogging on client's resources like Anubis nor gathering information
 
 ## Installation
 
-Put file botcheck.js into any place in your project, and write down relative path in your `require` clause.
+Put file botcheck.js into any place in your project, and use relative path in your `require` clause.
 
 ## Usage (HTTP sample)
 
