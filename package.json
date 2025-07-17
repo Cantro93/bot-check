@@ -1,0 +1,23 @@
+{
+  "name": "bot-check",
+  "version": "1.0.0",
+  "description": "Simple CAPTCHA-like system for Node.js servers",
+  "keywords": [
+    "captcha"
+  ],
+  "homepage": "https://github.com/Cantro93/bot-check#readme",
+  "bugs": {
+    "url": "https://github.com/Cantro93/bot-check/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Cantro93/bot-check.git"
+  },
+  "license": "LGPL-2.1-or-later",
+  "author": "Antoni Soltys",
+  "type": "commonjs",
+  "main": "botcheck.js",
+  "scripts": {
+    "test": "node test.js"
+  }
+}
