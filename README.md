@@ -15,27 +15,33 @@ It's neither hogging on client's resources like Anubis nor gathering information
 - asks for verification only every specified interval;
 - no need of redirection in purpose of verification;
 - should be working with HTTPS;
-- customizable with CSS.
+- customizable with CSS;
+- hosted directly on your server, as Node.js module.
 
 ## To do
 
-- make function that will be used as event listener for server `request` event
+- make function that will be used as event listener for server `request` event;
+- make npm package.
 
 ## Usage (HTTP sample)
 
 ```js
 const http = require('http');
-const BotChecker = require('./botcheck');
+const BotCheck = require('./botcheck');
 
 // create new bot checker instance, with interval of 5 hours (18000 s) and no CSS
-global.bc = new BotChecker(18000, '');
+global.bc = new BotCheck(18000, '');
 
 const server = http.createServer((req,res) => {
+  // BotCheck will need access to body of POST request 
   let data = '';
   req.on('data', chunk => {data += chunk.toString();});
   req.on('end', () => {
+
     // this object contains information how to treat that request
     const auth_result = global.bc.auth(req, data, false);
+
+    // auth_result.state values and their meaning were describe in
     switch (auth_result.state) {
       case 'accept':
         // as this request comes from human, serve content as normally
