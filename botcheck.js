@@ -22,11 +22,21 @@ class BotCheck
 {
   constructor(time, css)
   {
+    this.fs = require('fs');
+    this.joinPath = require('path').join;
     this.connections = new Map();
     // css should use only selectors using element tags or input's type attribute - everything else is randomized
     this.css = css;
     // as time is compared in milliseconds, conversion from seconds is required
     this.timing = time*1000;
+
+    this.templates = [];
+    this.loadTemplate('./templates/basic.1.html');
+    this.loadTemplate('./templates/basic.2.html');
+    this.loadTemplate('./templates/4-answer.1.html');
+    this.loadTemplate('./templates/4-answer.2.html');
+    this.loadTemplate('./templates/4-answer.3.html');
+    this.loadTemplate('./templates/4-answer.4.html');
   }
   //generate new session entry
   mkSession() {
@@ -35,36 +45,75 @@ class BotCheck
       gr: this.mkRandom(),
       br: this.mkRandom(),
       state: "pending",
-      time: Date.now()
+      time: Date.now(),
+      perm: false
     };
+  }
+  loadTemplate(filename)
+  {
+    this.templates.push(this.fs.readFileSync(this.joinPath(__dirname, filename), 'utf8'));
+  }
+  getTemplate()
+  {
+    let t = this.templates.shift();
+    this.templates.push(t);
+    return t;
   }
   // generate random hex strings
   mkRandom()
   {
     return Math.random().toString(16).substring(2);
   }
+  sessionExpired(sess)
+  {
+    if (sess != undefined && sess != null) {
+      console.log(`${JSON.stringify(sess)}`);
+      if (Object.hasOwn(sess, 'time')) {
+        console.log(`${(sess.time+this.timing)/1000} > ${Date.now()/1000}? ${sess.time+this.timing > Date.now()}`)
+        return sess.time+this.timing > Date.now();
+      }
+    };
+    return false;
+  }
   auth(req, data, https)
   {
     let ip = req.socket.remoteAddress;
-    if (this.connections.has(ip) && (this.connections.has(ip)?.time != undefined && this.connections.has(ip)?.time != null ? this.connections.has(ip).time : 0)+this.timing < Date.now()) {
+    console.log(`Request from ${ip}`);
+    // this complicated if checks whether entry for this IP exists and if it has expired
+    if (this.connections.has(ip) && this.sessionExpired(this.connections.get(ip)))
+    {
+      let sess = this.connections.get(ip);
+      console.log(`${ip}: Found session: ${sess}. Session expires on ${new Date(sess.time+this.timing)}. Now is ${new Date(Date.now())}`);
       // record exists and timeout has not occurred
-      if (this.connections.get(ip).state == "pending") {
+      if (req.url.includes(`${sess.id}/info`) || req.url.includes(`${sess.id}/data`)) {
+        sess.state = "reject";
+        sess.perm = true;
+        console.log(`${ip}: ${sess.id}: connection ${sess.state}ed.`);
+        return {state: "reject", body: ""};
+      };
+      if (sess.state == "pending") {
         // record required evaluation, now it will be done
-        let sess = this.connections.get(ip);
         if (data.includes(`${sess.id}=${sess.gr}`)) {
+
           sess.state = "accept";
         }
         else {
           sess.state = "reject";
         }
-
-      }
-      return {state: this.connections.get(ip).state, body: ""};
+        console.log(`${ip}: ${sess.id}: connection ${sess.state}ed`);
+      };
+      return {state: sess.state, body: ""};
     }
     else {
       if (this.connections.has(ip)) {
+        let sess = this.connections.get(ip);
+        console.log(`${ip}: Found session: ${sess}. Session expires on ${new Date(sess.time+this.timing)}. Now is ${new Date(Date.now())}`);
+        if (sess.perm) {
+          console.log(`${ip}: ${sess.id}: connection ${sess.state}ed.`);
+          return {state: this.connections.get(ip).state, body: ""};
+        }
         // clear entry if timeout occurred
-        this.connections.set(ip, {});
+        else { console.log(`${ip}: ${sess.id}: connection rejected. Session expired`);}
       }
       let sess = this.mkSession();
       let rand1 = this.mkRandom();
@@ -72,32 +121,8 @@ class BotCheck
       this.connections.set(ip, sess);
       return {
         state: "do_auth",
-        // below is the form template
-        body: `
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-          <meta charset="UTF-8"/>
-          <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-          <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
-          <title>Bot Verification</title>
-          <style>
-            ${this.css}
-          </style>
-        </head>
-        <body>
-          <form action="http${https ? 's' : ''}://${req.headers.host}${req.url}" method="post">
-            <label for="${rand2}">I am a robot</label>
-            <input type="radio" name="${sess.id}" value="${sess.br}" id="${rand2}" checked/>
-            <br>
-            <label for="${rand1}">I am not a robot</label>
-            <input type="radio" name="${sess.id}" value="${sess.gr}" id="${rand1}"/>
-            <input type="submit" value="Submit"/>
-          </form>
-          <p><a href="https://github.com/Cantro93/bot-check">Source Code</a></p>
-        </body>
-        </html>
-        `
+        // choose next form template
+        body: eval('`' + this.getTemplate() + '`')
       };
     }
   }

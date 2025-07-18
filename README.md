@@ -9,7 +9,7 @@ It's neither hogging on client's resources like Anubis nor gathering information
 ## Features
 
 - simple radio button form easy for human clients to fill;
-- storing only IP and form results, only for specified interval;
+- storing only IP and form results;
 - no JS on client-side;
 - fields and values are randomized;
 - asks for verification only every specified interval;
@@ -22,8 +22,10 @@ It's neither hogging on client's resources like Anubis nor gathering information
 
 - [ ] make function that will be used as event listener for server `request` event;
 - [ ] make npm package;
-- [ ] add whitelist and blacklist
-- [ ] ensure support for `multipart/form-data`
+- [ ] add whitelist and blacklist;
+- [ ] ensure support for `multipart/form-data`;
+- [ ] strengthen means of protection;
+- [ ] limit storage time of data.
 
 ## Installation
 
@@ -39,7 +41,7 @@ const BotCheck = require('./botcheck');
 global.bc = new BotCheck(18000, '');
 
 const server = http.createServer((req,res) => {
-  // BotCheck will need access to body of POST request 
+  // BotCheck will need access to body of POST request
   let data = '';
   req.on('data', chunk => {data += chunk.toString();});
   req.on('end', () => {
@@ -67,5 +69,3 @@ const server = http.createServer((req,res) => {
 
 server.listen(1080, 'localhost', () => {console.log("server started")});
 ```
-
-
